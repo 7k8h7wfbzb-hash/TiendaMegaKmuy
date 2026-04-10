@@ -26,7 +26,7 @@ struct TiendaMegaKmuyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            
+            PersonaListaView()
         }
         .modelContainer(sharedModelContainer)
     }
