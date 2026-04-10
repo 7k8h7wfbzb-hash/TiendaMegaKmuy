@@ -80,6 +80,7 @@ struct PersonaListaView: View {
                         Image(systemName: "plus")
                     }
                     .buttonStyle(.glass)
+                    
                 }
             }
         }

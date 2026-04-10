@@ -21,6 +21,7 @@ enum OpcionMenu: String, CaseIterable {
 
 struct BarraLateral: View {
     @State private var seleccion: OpcionMenu? = .personas
+    @AppStorage("Tema") private var tema: TemaApp = .sistema
 
     var body: some View {
         NavigationSplitView {
@@ -29,6 +30,23 @@ struct BarraLateral: View {
             }
             .navigationTitle("Mega Kmuy")
             .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 300)
+            .safeAreaInset(edge: .bottom) {
+                Menu {
+                    ForEach(TemaApp.allCases, id: \.self) { opcionTema in
+                        Button {
+                            tema = opcionTema
+                        } label: {
+                            Label(opcionTema.label, systemImage: opcionTema.icono)
+                        }
+                    }
+                } label: {
+                    Label(tema.label, systemImage: tema.icono)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+            }
         } detail: {
             switch seleccion {
             case .personas:

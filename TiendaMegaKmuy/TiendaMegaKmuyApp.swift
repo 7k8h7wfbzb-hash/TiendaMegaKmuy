@@ -8,8 +8,53 @@
 import SwiftUI
 import SwiftData
 
+
+enum TemaApp:String,CaseIterable{
+    case oscuro = "dark"
+    case claro = "light"
+    case sistema = "auto"
+    
+    var label:String{
+        switch self {
+        case .oscuro:
+            return "Oscuro"
+        case .claro:
+            return "Claro"
+        case .sistema:
+            return "Sistema"
+        }
+    }
+    
+    var icono:String{
+    switch self {
+        case .oscuro:
+            return "moon.fill"
+        case .claro:
+            return "sun.max.fill"
+        case .sistema:
+            return "slider.horizontal.3"
+        }
+        
+    }
+    
+    var esquemaColor:ColorScheme?{
+        switch self {
+        case .oscuro:
+            return .dark
+        case .claro:
+            return .light
+        case .sistema:
+            return nil
+        }
+    }
+}
+
+
 @main
 struct TiendaMegaKmuyApp: App {
+    
+    @AppStorage("Tema") private var tema:TemaApp = .sistema
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Persona.self,
@@ -26,7 +71,7 @@ struct TiendaMegaKmuyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            BarraLateral()
+            BarraLateral().preferredColorScheme(tema.esquemaColor)
         }
         .modelContainer(sharedModelContainer)
     }
