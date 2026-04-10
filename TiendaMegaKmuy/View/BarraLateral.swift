@@ -28,6 +28,7 @@ struct BarraLateral: View {
                 Label(opcion.rawValue, systemImage: opcion.icono)
             }
             .navigationTitle("Mega Kmuy")
+            .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 300)
         } detail: {
             switch seleccion {
             case .personas:
@@ -42,5 +43,6 @@ struct BarraLateral: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .navigationSplitViewStyle(.balanced)
     }
 }
