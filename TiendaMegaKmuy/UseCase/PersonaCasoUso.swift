@@ -72,7 +72,7 @@ struct PersonaCasoUso {
     /// Valida si una cédula de identidad ecuatoriana es auténtica.
     /// Utiliza el algoritmo de Luhn (módulo 10) que es el estándar del Registro Civil de Ecuador.
     /// La cédula ecuatoriana tiene 10 dígitos: 2 de provincia, 1 de tipo, 6 de secuencia y 1 verificador.
-    func validarCedula(cedula:String) -> Bool {
+    static func validarCedula(cedula:String) -> Bool {
         // Paso 1: La cédula debe tener exactamente 10 caracteres numéricos.
         // Si tiene menos, más, o contiene letras/símbolos, se rechaza inmediatamente.
         guard cedula.count == 10 ,cedula.allSatisfy(\.isNumber) else {

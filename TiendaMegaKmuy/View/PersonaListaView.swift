@@ -6,21 +6,12 @@
 //
 
 import SwiftUI
-
-#if canImport(UIKit)
-import UIKit
-#elseif canImport(AppKit)
 import AppKit
-#endif
+import SwiftData
 
 private func imageFromData(_ data: Data) -> Image? {
-    #if canImport(UIKit)
-    guard let uiImage = UIImage(data: data) else { return nil }
-    return Image(uiImage: uiImage)
-    #elseif canImport(AppKit)
     guard let nsImage = NSImage(data: data) else { return nil }
     return Image(nsImage: nsImage)
-    #endif
 }
 
 struct PersonaListaView: View {
@@ -28,19 +19,19 @@ struct PersonaListaView: View {
     @State private var viewModel: PersonaViewModel?
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if let viewModel {
-                    if viewModel.estaCargando {
-                        ProgressView("Cargando...")
-                    } else if viewModel.personas.isEmpty {
-                        ContentUnavailableView(
-                            "Sin personas",
-                            systemImage: "person.slash",
-                            description: Text("Agrega una persona con el botón +")
-                        )
-                    } else {
-                        List(viewModel.personas, id: \.id) { persona in
+        Group {
+            if let viewModel {
+                if viewModel.estaCargando {
+                    ProgressView("Cargando...")
+                } else if viewModel.personas.isEmpty {
+                    ContentUnavailableView(
+                        "Sin personas",
+                        systemImage: "person.slash",
+                        description: Text("Agrega una persona con el botón +")
+                    )
+                } else {
+                    List(viewModel.personas, id: \.id) { persona in
+                        NavigationLink(value: persona.id) {
                             HStack(spacing: 12) {
                                 if let imagenData = persona.imagen, let img = imageFromData(imagenData) {
                                     img
@@ -69,37 +60,44 @@ struct PersonaListaView: View {
                             .padding(.vertical, 4)
                         }
                     }
-                } else {
-                    ProgressView()
-                }
-            }
-            .navigationTitle("Personas")
-            .toolbar {
-                if let viewModel {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            viewModel.mostraerFormulario = true
-                        } label: {
-                            Image(systemName: "plus")
+                    .navigationDestination(for: UUID.self) { id in
+                        if let persona = viewModel.personas.first(where: { $0.id == id }) {
+                            PersonaDetalleView(viewModel: viewModel, persona: persona)
                         }
-                        .buttonStyle(.glass)
                     }
                 }
+            } else {
+                ProgressView()
             }
-            .sheet(item: Binding(
-                get: { viewModel?.mostraerFormulario == true ? viewModel : nil },
-                set: { _ in viewModel?.mostraerFormulario = false }
-            )) { vm in
-                PersonaFormularioView(viewModel: vm)
+        }
+        .navigationTitle("Personas")
+        .toolbar {
+            if let viewModel {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        viewModel.mostraerFormulario = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .buttonStyle(.glass)
+                }
             }
-            .task {
-                if viewModel == nil {
-                    let repositorio = PersonaRepositorioImplementacionLocal(context: modelContext)
-                    viewModel = PersonaViewModel(repositorio: repositorio)
-                }
-                if let viewModel {
-                    await viewModel.traerPersonas()
-                }
+        }
+        .sheet(isPresented: Binding(
+            get: { viewModel?.mostraerFormulario ?? false },
+            set: { viewModel?.mostraerFormulario = $0 }
+        )) {
+            if let viewModel {
+                PersonaFormularioView(viewModel: viewModel)
+            }
+        }
+        .task {
+            if viewModel == nil {
+                let repositorio = PersonaRepositorioImplementacionLocal(context: modelContext)
+                viewModel = PersonaViewModel(repositorio: repositorio)
+            }
+            if let viewModel {
+                await viewModel.traerPersonas()
             }
         }
     }
