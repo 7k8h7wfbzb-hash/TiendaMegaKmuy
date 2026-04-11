@@ -8,19 +8,17 @@
 import SwiftUI
 
 enum OpcionMenu: String, CaseIterable {
-    case personas = "Personas"
     case empleados = "Empleados"
 
     var icono: String {
         switch self {
-        case .personas: return "person.2"
         case .empleados: return "briefcase"
         }
     }
 }
 
 struct BarraLateral: View {
-    @State private var seleccion: OpcionMenu? = .personas
+    @State private var seleccion: OpcionMenu? = .empleados
     @AppStorage("Tema") private var tema: TemaApp = .sistema
 
     var body: some View {
@@ -49,12 +47,8 @@ struct BarraLateral: View {
             }
         } detail: {
             switch seleccion {
-            case .personas:
-                PersonaListaView()
             case .empleados:
-                Text("Empleados - Próximamente")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                EmpleadoListaView()
             case nil:
                 Text("Selecciona una opción")
                     .font(.title2)
